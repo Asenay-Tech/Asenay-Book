@@ -1,0 +1,19 @@
+# Environment variables
+.env.local
+.env*
+
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+
+# Supabase
+.supabase/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
