@@ -1,0 +1,51 @@
+name: Cursor AI Automation Helper
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every 6 hours to check for any pending automation tasks
+    - cron: '0 */6 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  automation-check:
+    name: Check Automation Tasks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup environment
+        run: |
+          echo "🤖 Cursor AI Automation Helper"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Triggered by: ${{ github.event_name }}"
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Cursor AI Automation"
+          git config --global user.email "automation@cursor-ai.bot"
+
+      - name: Check repository status
+        run: |
+          echo "📊 Repository Status:"
+          git status
+          echo ""
+          echo "📝 Recent commits:"
+          git log --oneline -5
+
+      - name: Automation complete
+        run: |
+          echo "✅ Automation check complete!"
+          echo "💡 Tip: Use the 'Auto Commit and Push' workflow for manual commits"
+          echo "📚 Tip: All commits to main require PR approval due to branch protection"
+

@@ -1,0 +1,88 @@
+name: Auto Commit and Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to commit to'
+        required: true
+        default: 'develop'
+      commit_message:
+        description: 'Commit message'
+        required: true
+        default: 'chore: automated commit'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-commit:
+    name: Automated Commit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Cursor AI Bot"
+          git config --global user.email "cursor-ai@asenay-tech.github.io"
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add .
+          git commit -m "${{ github.event.inputs.commit_message }}"
+
+      - name: Push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git push origin ${{ github.event.inputs.branch }}
+
+      - name: No changes detected
+        if: steps.check_changes.outputs.has_changes == 'false'
+        run: echo "ℹ️ No changes to commit"
+
+  create-pr-if-needed:
+    name: Create PR to Main
+    runs-on: ubuntu-latest
+    needs: auto-commit
+    if: github.event.inputs.branch != 'main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event.inputs.branch }}
+          base: main
+          title: "🤖 Automated PR from ${{ github.event.inputs.branch }}"
+          body: |
+            ## Automated Pull Request
+            
+            This PR was automatically created by Cursor AI automation.
+            
+            **Branch:** `${{ github.event.inputs.branch }}`
+            **Commit:** ${{ github.event.inputs.commit_message }}
+            
+            Please review the changes before merging.
+          labels: automated, cursor-ai
+
