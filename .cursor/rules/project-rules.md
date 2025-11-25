@@ -82,20 +82,37 @@ alwaysApply: true
    - Confirm step works as specified
    - Only mark complete when ALL criteria met
 
-7. **Commit & Push** (after user confirms step works):
-   - **CRITICAL**: Cursor AI MUST wait for manual confirmation before continuing
-   - **NEVER auto-advance** to the next step, even if tests pass
-   - **NEVER assume** permission to continue
-   - Only commit and push after explicit user confirmation
-   - Commit with message: `Step {NUMBER}: {Description}`
-   - Push to feature branch
-   - **WAIT** for user to paste next step
+7. **Commit & Push** (FULLY AUTONOMOUS):
+   - ✅ **Auto-commit**: Create commits automatically with descriptive messages
+   - ✅ **Auto-push**: Push to GitHub automatically after commits
+   - ✅ **Commit format**: Use conventional commits (feat:, fix:, docs:, db:, etc.)
+   - ✅ **Rollback**: Include rollback instructions in migration comments
+   - ✅ **No confirmation needed**: Commit and push immediately after creating/modifying files
+   - ⚠️ **Exception**: Only ask for confirmation on destructive operations (DROP TABLE, DELETE data)
+
+### Autonomous Workflow:
+1. Create/modify files
+2. Auto-commit with descriptive message
+3. Auto-push to GitHub
+4. GitHub Actions deploys automatically via `.github/workflows/supabase-deploy.yml`
+5. Continue to next task
 
 ### Commit Message Format:
 ```
-Step {NUMBER}: {Short Description}
+{type}: {description}
 
-Example: Step 051: Create Token Usage Table Migration
+Types:
+- feat: New feature
+- fix: Bug fix
+- db: Database migration
+- docs: Documentation
+- chore: Maintenance
+
+Examples:
+- feat: add user authentication
+- db: create organizations table with RLS
+- fix: correct profile trigger logic
+- docs: update setup guide
 ```
 
 ## Technology Stack (Reference LEARNING_ROADMAP.md)
@@ -129,13 +146,21 @@ Example: Step 051: Create Token Usage Table Migration
 4. **Testing**: Test each feature in local browser after implementation
 5. **Documentation**: Add comments for complex logic
 
-## GitHub Automation
+## GitHub Automation (FULLY AUTONOMOUS)
 
-1. **Automatic Commits**: After each step completion (when user confirms)
-2. **Feature Branches**: Create for each major feature
-3. **PR Creation**: Automatic PR creation for review (when appropriate)
-4. **CI/CD**: All workflows must pass before merging
-5. **Rollback**: Keep atomic commits for easy rollback
+1. **Automatic Commits**: After creating/modifying any files (no user confirmation needed)
+2. **Automatic Push**: Push to GitHub immediately after commit
+3. **GitHub Actions**: Auto-deploys via `.github/workflows/supabase-deploy.yml`
+4. **Feature Branches**: Use for experimental features (optional)
+5. **PR Creation**: For major features only (most changes go directly to main)
+6. **Rollback**: Keep atomic commits for easy rollback via `git revert`
+
+### Deployment Flow:
+```
+Cursor creates files → Auto-commit → Auto-push → GitHub Actions → Supabase deployed
+```
+
+**Zero user intervention required!**
 
 ## Phase Execution Order
 
@@ -205,17 +230,17 @@ When user pastes a step:
 5. **Execute**: Implement in dev tab following exact specifications
 6. **Test**: Guide user to test in local browser
 7. **Verify**: Confirm acceptance criteria met
-8. **Commit**: After user confirms, commit and push
+8. **Commit & Push**: Automatically commit and push changes to GitHub
 9. **Wait**: Wait for user to paste next step
 
 **NEVER**:
 - Execute multiple steps at once
-- Skip testing in browser
-- Move to next step without user confirmation
+- Skip testing in browser (when applicable)
 - Invent features not in planning documents
 - Continue if step cannot be found in CURSOR_AI_DEVELOPMENT_PLAN.md
 - Guess or assume missing steps
-- Auto-advance even if tests pass (must wait for manual confirmation)
+- Commit sensitive files (.env*, API keys, credentials)
+- Force push to main/master branches
 
 ## When in Doubt
 
