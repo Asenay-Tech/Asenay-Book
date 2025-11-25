@@ -1,0 +1,7 @@
+{
+  "cursor.terminal.autoRun": true,
+  "cursor.terminal.timeout": 300000,
+  "cursor.terminal.autoApprove": true,
+  "cursor.chat.autoRunCommands": true
+}
+
