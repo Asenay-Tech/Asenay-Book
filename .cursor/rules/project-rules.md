@@ -82,13 +82,14 @@ alwaysApply: true
    - Confirm step works as specified
    - Only mark complete when ALL criteria met
 
-7. **Commit & Push** (FULLY AUTONOMOUS):
-   - ✅ **Auto-commit**: Create commits automatically with descriptive messages
-   - ✅ **Auto-push**: Push to GitHub automatically after commits
+7. **Commit & Push** (SEMI-AUTONOMOUS):
+   - ✅ **Cursor creates files**: Autonomous file creation and modification
+   - ⚠️ **User commits/pushes**: Due to terminal timeout limitations, user runs: `git add . && git commit -m "message" && git push origin main`
    - ✅ **Commit format**: Use conventional commits (feat:, fix:, docs:, db:, etc.)
    - ✅ **Rollback**: Include rollback instructions in migration comments
-   - ✅ **No confirmation needed**: Commit and push immediately after creating/modifying files
-   - ⚠️ **Exception**: Only ask for confirmation on destructive operations (DROP TABLE, DELETE data)
+   - ✅ **GitHub auto-deploys**: After push, GitHub Actions deploys automatically
+   
+   **Technical Limitation:** Cursor's terminal tool times out on Git network operations. User must run one simple command after Cursor creates files.
 
 ### Autonomous Workflow:
 1. Create/modify files

@@ -74,9 +74,9 @@ serve(async (req) => {
 
       default:
         throw new Error(`Unknown task: ${taskRequest.task}`);
-    }
+  }
 
-    return new Response(
+  return new Response(
       JSON.stringify(result),
       { 
         headers: { ...corsHeaders, "Content-Type": "application/json" },

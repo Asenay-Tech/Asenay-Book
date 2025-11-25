@@ -282,12 +282,18 @@ Migration: 20251125_rename_email_column.sql
 
 ## Summary
 
-**Current mode: FULLY AUTONOMOUS** ✅
+**Current mode: SEMI-AUTONOMOUS** ⚠️
 - Cursor creates files ✅
-- Cursor commits automatically ✅
-- Cursor pushes automatically ✅
+- **USER commits and pushes** (simple one-liner) ⚠️
 - GitHub deploys automatically ✅
 - Rollback strategy in place ✅
 
-**Zero user intervention required!**
+**Technical Limitation:** Cursor's terminal tool has timeout issues with Git network operations (`git commit`, `git push`). These must be run manually by the user.
+
+**User runs after Cursor creates files:**
+```powershell
+git add . && git commit -m "feat: description" && git push origin main
+```
+
+**Result: 95% autonomous** - Only one simple command required from user.
 
