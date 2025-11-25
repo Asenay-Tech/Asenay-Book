@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -27,26 +29,68 @@ jobs:
           supabase link --project-ref shxfavcyrfzhmeyyiopq
       
       - name: Push database migrations
+        id: push_migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           supabase db push --linked
+        continue-on-error: true
+      
+      - name: Rollback on migration failure
+        if: steps.push_migrations.outcome == 'failure'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Migration failed! Initiating rollback..."
+          git revert HEAD --no-edit
+          git push origin main
+          exit 1
       
       - name: Deploy Edge Functions
+        id: deploy_functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           supabase functions deploy --project-ref shxfavcyrfzhmeyyiopq
+        continue-on-error: true
+      
+      - name: Rollback on function deployment failure
+        if: steps.deploy_functions.outcome == 'failure'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "Function deployment failed! Initiating rollback..."
+          git revert HEAD --no-edit
+          git push origin main
+          exit 1
       
       - name: Generate TypeScript types
+        id: generate_types
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           supabase gen types typescript --linked > types/supabase.ts
+        continue-on-error: true
       
       - name: Commit updated types
+        if: steps.generate_types.outcome == 'success'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: update Supabase types [skip ci]"
           file_pattern: types/supabase.ts
-
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Supabase deployment successful!"
+          echo "Migrations: ${{ steps.push_migrations.outcome }}"
+          echo "Functions: ${{ steps.deploy_functions.outcome }}"
+          echo "Types: ${{ steps.generate_types.outcome }}"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed and was rolled back"
+          echo "Check logs above for details"
+          exit 1

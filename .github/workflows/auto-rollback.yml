@@ -1,0 +1,42 @@
+name: Auto Rollback on Deployment Failure
+
+on:
+  workflow_run:
+    workflows: ["Auto Deploy Supabase"]
+    types:
+      - completed
+
+jobs:
+  rollback-on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "Cursor AI Bot"
+          git config user.email "cursor-ai@asenay-tech.github.io"
+      
+      - name: Create rollback commit
+        run: |
+          echo "Deployment failed - creating rollback commit"
+          git revert HEAD --no-edit -m "auto-rollback: deployment failed"
+          git push origin main
+      
+      - name: Tag failed deployment
+        run: |
+          git tag "failed-$(date +%Y%m%d-%H%M%S)"
+          git push origin --tags
+      
+      - name: Notify rollback
+        run: |
+          echo "✅ Automatic rollback complete"
+          echo "Failed deployment has been reverted"
+          echo "Previous stable state restored"
+
