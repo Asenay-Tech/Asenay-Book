@@ -2,6 +2,19 @@
 .env.local
 .env*
 
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://shxfavcyrfzhmeyyiopq.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoeGZhdmN5cmZ6aG1leXlpb3BxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTIyMDQsImV4cCI6MjA3OTU4ODIwNH0.Q-cqQvWeQMScYDDJtROBs-QJPG1MrGEJo8EmR6bJ_tU
+
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoeGZhdmN5cmZ6aG1leXlpb3BxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDAxMjIwNCwiZXhwIjoyMDc5NTg4MjA0fQ.IIqyWeGhhJx37PEOvDjG77ERPQLfFk5NVrOD50HwsOo
+
+# Database (for direct access and MCP)
+# Note: password '+' is URL-encoded as %2B
+DATABASE_URL=postgresql://postgres:%2BiK_3RmD%2BMr8VaM@db.shxfavcyrfzhmeyyiopq.supabase.co:5432/postgres
+
+
+
+
 # Dependencies
 node_modules/
 
